@@ -30,11 +30,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
-  cupertino_icons: ^1.0.8
-  flutter_vlc_player: ^7.4.3  # For video playback
-  path_provider: ^2.1.1       # To access file system directories
-  permission_handler: ^11.3.1 # To request permissions
+  path_provider: ^2.1.1
+  permission_handler: ^11.3.1
+  device_info_plus: ^10.1.0
+  video_player: ^2.9.1
   
   
 
