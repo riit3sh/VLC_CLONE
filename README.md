@@ -1,16 +1,61 @@
-# flutter_application_2
+# VLC Clone
 
-A new Flutter project.
+A Minimum Viable Product (MVP) of a VLC-like media player for Android, built with Flutter. This application focuses on core video playback functionality with a simple, user-friendly interface.
+
+## Features
+
+### Browse Section
+- Browse and play local video files
+- Support for common video formats
+- Folder navigation and file browsing
+
+### Video Player
+- Basic video playback controls:
+  - Play/Pause
+  - Seek forward/backward
+  - Progress bar for video timeline
+- Stream video content
+- Full-screen support
+
+## Screenshots
+
+[Add screenshots of your application here]
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
+- Flutter SDK (latest version)
+- Android Studio
+- Android SDK
+- A physical Android device or emulator
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Installation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Clone the repository
+```bash
+git clone https://github.com/riit3sh/VLC_CLONE.git
+```
+
+2. Navigate to the project directory
+```bash
+cd VLC_CLONE
+```
+
+3. Install dependencies
+```bash
+flutter pub get
+```
+
+## How to Use
+
+1. Launch the app
+2. Use the Browse section to navigate through your device's folders
+3. Select a video file to play
+4. Use the player controls to:
+   - Play/Pause video
+   - Seek forward or backward
+   - Adjust playback position using the progress bar
+
+
+
