@@ -18,7 +18,7 @@ class _FirstPageState extends State<FirstPage> {
     });
   }
 
-  final List<Widget> _pages = [Browse(), StreamPage()];
+  final List<Widget> _pages = [Browse(), LiveStreamScreen()];
 
   @override
   Widget build(BuildContext context) {

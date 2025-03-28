@@ -119,7 +119,7 @@ class _BrowseState extends State<Browse> {
               : _errorMessage.isNotEmpty
               ? Center(child: Text(_errorMessage))
               : ListView.builder(
-                itemCount: _entities.length + 1, // +1 for the ".." option
+                itemCount: _entities.length + 1,
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     // ".." option at the top
@@ -129,7 +129,7 @@ class _BrowseState extends State<Browse> {
                       onTap: _navigateToParentDirectory,
                     );
                   }
-                  final entity = _entities[index - 1]; // Adjust index for ".."
+                  final entity = _entities[index - 1];
                   return ListTile(
                     leading:
                         entity is Directory

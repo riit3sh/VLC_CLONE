@@ -1,102 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 
-class StreamPage extends StatefulWidget {
-  const StreamPage({super.key});
+class LiveStreamScreen extends StatefulWidget {
+  const LiveStreamScreen({Key? key}) : super(key: key);
 
   @override
-  State<StreamPage> createState() => _StreamPageState();
+  _LiveStreamScreenState createState() => _LiveStreamScreenState();
 }
 
-class _StreamPageState extends State<StreamPage> {
-  VlcPlayerController? _vlcController; // Make it nullable
+class _LiveStreamScreenState extends State<LiveStreamScreen> {
+  VlcPlayerController? _videoPlayerController; // Make it nullable
   final TextEditingController _urlController = TextEditingController();
-  bool _isInitialized = false;
   bool _isLoading = false;
-
-  void _playStream() async {
-    final url = _urlController.text.trim();
-    if (url.isNotEmpty) {
-      setState(() {
-        _isLoading = true;
-        _isInitialized = false;
-      });
-
-      // Dispose of the previous controller if it exists
-      _vlcController?.dispose();
-
-      debugPrint("Initializing VLC player with URL: $url");
-
-      // Initialize the VLC player controller
-      _vlcController = VlcPlayerController.network(
-        url,
-        hwAcc: HwAcc.auto,
-        autoPlay: true,
-        options: VlcPlayerOptions(),
-      );
-
-      try {
-        debugPrint("Waiting for VLC player to initialize...");
-        await _vlcController!.initialize();
-
-        if (_vlcController!.value.isInitialized) {
-          debugPrint("VLC player initialized successfully.");
-          setState(() {
-            _isInitialized = true;
-            _isLoading = false;
-          });
-          _vlcController!.play(); // Start playing the video
-        } else {
-          debugPrint("VLC player failed to initialize.");
-          setState(() {
-            _isInitialized = false;
-            _isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Failed to initialize the video player."),
-            ),
-          );
-        }
-      } catch (e) {
-        debugPrint("Initialization error: $e");
-        setState(() {
-          _isInitialized = false;
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Initialization error: $e")));
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize with an empty controller
-    _vlcController = VlcPlayerController.network(
-      '', // Initial empty URL
-      hwAcc: HwAcc.auto,
-      autoPlay: false,
-      options: VlcPlayerOptions(),
-    );
-  }
+  bool _isInitialized = false;
 
   @override
   void dispose() {
-    _vlcController?.dispose();
+    _videoPlayerController?.dispose(); // Dispose if not null
     _urlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _initializePlayer(String url) async {
+    if (_videoPlayerController != null) {
+      await _videoPlayerController!.stop();
+      await _videoPlayerController!.dispose();
+    }
+
+    // Initialize the VLC player controller
+    _videoPlayerController = VlcPlayerController.network(
+      url,
+      hwAcc: HwAcc.auto,
+      autoPlay: true,
+      options: VlcPlayerOptions(),
+    );
+
+    // Listen for initialization and errors
+    _videoPlayerController!.addListener(() {
+      if (_videoPlayerController!.value.isInitialized && !_isInitialized) {
+        setState(() {
+          _isInitialized = true;
+          _isLoading = false;
+        });
+      }
+    });
+
+    try {
+      debugPrint("Initializing VLC Player for: $url");
+      await _videoPlayerController!.initialize().then((_) {
+        setState(() {
+          _isInitialized = true;
+          _isLoading = false;
+        });
+      });
+    } catch (e) {
+      debugPrint("Error initializing VLC player: $e");
+      setState(() {
+        _isLoading = false;
+        _isInitialized = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed to load video: $e")));
+    }
+  }
+
+  void _playStream() {
+    final url = _urlController.text.trim();
+    if (url.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a valid URL.")),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _isInitialized = false;
+    });
+
+    _initializePlayer(url);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Streams"),
-        backgroundColor: Colors.black87,
-      ),
+      appBar: AppBar(title: const Text("Live Stream")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -105,7 +94,7 @@ class _StreamPageState extends State<StreamPage> {
               controller: _urlController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: "Enter network address (https or ftp)",
+                labelText: "Enter stream URL (https or ftp)",
               ),
             ),
             const SizedBox(height: 10),
@@ -114,20 +103,25 @@ class _StreamPageState extends State<StreamPage> {
               child:
                   _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text("Play"),
+                      : const Text("Play Stream"),
             ),
             const SizedBox(height: 20),
-            _isInitialized
-                ? Expanded(
-                  child: VlcPlayer(
-                    controller: _vlcController!,
-                    aspectRatio: 16 / 9,
-                    placeholder: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                )
-                : const Text("Enter a valid URL and press play."),
+            Expanded(
+              child:
+                  _isInitialized && _videoPlayerController != null
+                      ? VlcPlayer(
+                        controller: _videoPlayerController!,
+                        aspectRatio: 16 / 9,
+                        placeholder: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                      : const Center(
+                        child: Text(
+                          "Enter a valid URL and press 'Play Stream'.",
+                        ),
+                      ),
+            ),
           ],
         ),
       ),

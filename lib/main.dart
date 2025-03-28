@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/firstpage': (context) => FirstPage(),
         '/browsepage': (context) => Browse(),
-        '/streampage': (context) => StreamPage(),
+        '/streampage': (context) => LiveStreamScreen(),
       },
     );
   }
